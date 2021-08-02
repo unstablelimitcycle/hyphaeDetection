@@ -2,14 +2,15 @@ import cv2
 from os import listdir
 from os.path import isfile, join
 import numpy as np
+import pandas as pd
 from matplotlib import pyplot as plt
 from hyphaeDetectionFunctions import load_images_from_folder
 
 #Designate folder to open
-folder_to_open = '/Users/lisarogers/PythonStuff/allImages/CompleteData/'
+folder_to_open = '/Users/lisarogers/Dropbox/Pictures for Lisa/02152021/200 uM/WLP066/'
 
 #Designate path to write files to 
-path = '/Users/lisarogers/PythonStuff/allImages/WrittenImagesforML/'
+path = '/Users/lisarogers/PythonStuff/writtenImages02152021/WLP066/200 uM/'
 
 #Get file name to use as string in CSV columns
 filenames = listdir(folder_to_open)
@@ -34,7 +35,7 @@ for n in range(0, len(Images)):
     blur_images = cv2.GaussianBlur(images,(5,5), 0)
 
     # Threshhold images and save images
-    _, thresh_images = cv2.threshold(blur_images,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    _, thresh_images = cv2.threshold(blur_images,125,255,cv2.THRESH_BINARY)
     # thresh_image = f'threshholdcolony{n}.jpg'
     # cv2.imwrite(join(path, thresh_image), thresh_images)
   
@@ -83,10 +84,11 @@ for n in range(0, len(Images)):
     # approx2 = cv2.approxPolyDP(cnt2, epsilon2, True)
 
     # Draw and Store Contours
-    
-    cv2.drawContours(images, contours, -1, (0,255,0), 2)
-    #image_contours = f'allContours{n}.jpg'
-    #cv2.imwrite(join(path, image_contours), images)
+    img_contours = np.zeros(images.shape)
+    img_contours = cv2.drawContours(images, [cnt1, cnt2], -1, (0,255,0), 1)
+    #cv2.drawContours(images, contours, -1, (0,255,0), 2)
+    image_contours = f'allContours{n}.jpg'
+    cv2.imwrite(join(path, image_contours), img_contours)
     
 
     #Compute and store Growth Index
@@ -95,29 +97,19 @@ for n in range(0, len(Images)):
     hyphae[n] = np.abs(area1[n] - area2[n])
     growthIndex[n] = hyphae[n]/np.minimum(area1[n],area2[n])
     
-    # #Introduce threshold for growthIndex
-    # if growthIndex[n] > 5:
-    #     outliers = [] #Set this outside of loop?
-    #     growthIndex[n] =  outliers.append()
-    #     else:
-    #         return 
-    
 #Statistics for each colony
 meanIndex = np.mean(growthIndex)
+medianIndex =  np.median(growthIndex)
 stdIndex = np.std(growthIndex)
-varIndex = np.var(growthIndex)
-print(meanIndex)
-print(stdIndex)
-print(varIndex)
-fig = plt.hist(growthIndex, bins='auto')
-#plt.show()
-#plt.savefig('/Users/lisarogers/PythonStuff/Written Images 02152021/histogram.jpg')
+medianArea  = np.median(area2)
 
 #Create DataFrame for csv files
 data = {'Image Name': stringsforCSV,'Area 1': area1, 'Area 2': area2,'Growth Index': growthIndex}
+#data2 = {'Mean Index': [meanIndex], 'Median Index': [medianIndex], 'Std Dev Index': [stdIndex]}
 
 #Read data into a CSV 
 df = pd.DataFrame(data, columns = ['Image Name', 'Area 1', 'Area 2', 'Growth Index'])
-df.to_csv('Processed Yeast Image Data Complete.csv')
-
-
+#df2  = pd.DataFrame(data2, columns = ['Mean Index', 'Median Index', 'Std Dev Index'])
+#newdf = df.append(df2)
+#newdf.to_csv('Data 02152021 WLP066 200uM.csv')
+df.to_csv('Analyzed Image Data')

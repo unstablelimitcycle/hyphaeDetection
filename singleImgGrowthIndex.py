@@ -3,12 +3,13 @@ import numpy as np
 
 # Same stuff as image_reader.py, but with just one image
 
-img = cv2.imread('62_17.jpg')
+img = cv2.imread('62_29.jpg')
 
 img_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 cv2.imwrite('img_grey.jpg', img_grey)
 
 img_blur = cv2.GaussianBlur(img_grey,(5,5), 0)
+cv2.imwrite('img_blur.jpg', img_blur)
 
 # Global Threshold
 _, thresh_img = cv2.threshold(img_blur, 125, 255, cv2.THRESH_BINARY)
@@ -24,9 +25,9 @@ cv2.imwrite('otsu_thresh.jpg', otsu_thresh)
 #Elliptical Kernals
 kernal_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 kernal_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(25,25))
-opening = cv2.morphologyEx(otsu_thresh, cv2.MORPH_OPEN, kernal_open)
-closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernal_close)
-cv2.imwrite('opening.jpg',opening)
+#opening = cv2.morphologyEx(otsu_thresh, cv2.MORPH_OPEN, kernal_open)
+closing = cv2.morphologyEx(thresh_img, cv2.MORPH_CLOSE, kernal_close)
+#cv2.imwrite('opening.jpg',opening)
 cv2.imwrite('closing.jpg',closing)
 
 #Trying Gaussian Kernel
@@ -85,15 +86,14 @@ img_contours = np.zeros(img.shape)
 #img_contours = cv2.drawContours(img_grey, [cnt0], 0, (0,255,0), 1)
 #img_contours = cv2.drawContours(img_grey, [approx1, approx2],-1,(0,254,0),2)
 cv2.drawContours(img_contours, [approx1, approx2],-1,(0,254,0),2)
+cv2.imwrite('approx_contours.jpg', img_contours)
+
+#Try instead drawing contours on top of BW pic
+
+cv2.drawContours(img_contours, [cnt0, cnt1], -1,(0,255,0),2)
 cv2.imwrite('contours.jpg', img_contours)
-
-
 #Find area within contour, compute growthIndex
 area1 = cv2.contourArea(cnt0) # replace approx1 with cnt0
 area2 = cv2.contourArea(cnt1) # replace approx2 with cnt2
 hyphae = area1-area2
 growthIndex = hyphae/area2
-#print(area1)
-#print(area2)
-#print(hyphae)
-#print(growthIndex)
