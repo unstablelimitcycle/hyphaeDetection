@@ -1,1 +1,5 @@
 .DS_Store
+Images/
+Spreadsheets/
+__pycache__/
+Code_Tests/
