@@ -85,8 +85,8 @@ img_contours = np.zeros(img.shape)
 # Draw Contours
 #img_contours = cv2.drawContours(img_grey, [cnt0], 0, (0,255,0), 1)
 #img_contours = cv2.drawContours(img_grey, [approx1, approx2],-1,(0,254,0),2)
-cv2.drawContours(img_contours, [approx1, approx2],-1,(0,254,0),2)
-cv2.imwrite('approx_contours.jpg', img_contours)
+#cv2.drawContours(img_contours, [approx1, approx2],-1,(0,254,0),2)
+#cv2.imwrite('approx_contours.jpg', img_contours)
 
 #Try instead drawing contours on top of BW pic
 

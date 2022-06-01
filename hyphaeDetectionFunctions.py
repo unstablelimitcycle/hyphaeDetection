@@ -8,3 +8,6 @@ def load_images_from_folder(folder):
         if img is not None:
             images.append(img)
     return images
+
+
+

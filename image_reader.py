@@ -7,10 +7,10 @@ from matplotlib import pyplot as plt
 from hyphaeDetectionFunctions import load_images_from_folder
 
 #Designate folder to open
-folder_to_open = '/Users/lisarogers/Dropbox/Pictures for Lisa/02152021/200 uM/WLP066/'
+folder_to_open = '/Users/lisarogers/Dropbox/Pictures for Lisa/20032021/0 uM/WLP028/'
 
 #Designate path to write files to 
-path = '/Users/lisarogers/PythonStuff/writtenImages02152021/WLP066/200 uM/'
+path = '/Users/lisarogers/PythonStuff/writtenImagesNew/'
 
 #Get file name to use as string in CSV columns
 filenames = listdir(folder_to_open)
@@ -85,10 +85,10 @@ for n in range(0, len(Images)):
 
     # Draw and Store Contours
     img_contours = np.zeros(images.shape)
-    img_contours = cv2.drawContours(images, [cnt1, cnt2], -1, (0,255,0), 1)
+    cv2.drawContours(img_contours, [cnt1, cnt2], -1, (0,255,0), 2)
     #cv2.drawContours(images, contours, -1, (0,255,0), 2)
-    image_contours = f'allContours{n}.jpg'
-    cv2.imwrite(join(path, image_contours), img_contours)
+    #image_contours = f'allContours{n}.jpg'
+    #cv2.imwrite(join(path, image_contours), img_contours)
     
 
     #Compute and store Growth Index
@@ -102,14 +102,15 @@ meanIndex = np.mean(growthIndex)
 medianIndex =  np.median(growthIndex)
 stdIndex = np.std(growthIndex)
 medianArea  = np.median(area2)
+varIndex = np.var(growthIndex)
 
 #Create DataFrame for csv files
 data = {'Image Name': stringsforCSV,'Area 1': area1, 'Area 2': area2,'Growth Index': growthIndex}
-#data2 = {'Mean Index': [meanIndex], 'Median Index': [medianIndex], 'Std Dev Index': [stdIndex]}
+data2 = {'Mean Index': [meanIndex], 'Median Index': [medianIndex], 'Std Dev Index': [stdIndex], 'Variance Index': [varIndex]}
 
 #Read data into a CSV 
 df = pd.DataFrame(data, columns = ['Image Name', 'Area 1', 'Area 2', 'Growth Index'])
-#df2  = pd.DataFrame(data2, columns = ['Mean Index', 'Median Index', 'Std Dev Index'])
-#newdf = df.append(df2)
-#newdf.to_csv('Data 02152021 WLP066 200uM.csv')
-df.to_csv('Analyzed Image Data')
+df2  = pd.DataFrame(data2, columns = ['Mean Index', 'Median Index', 'Std Dev Index', 'Variance Index'])
+newdf = df.append(df2)
+newdf.to_csv('Data 20032021 WLP028 0uM.csv')
+#df.to_csv('Analyzed Image Data')
