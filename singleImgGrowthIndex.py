@@ -3,7 +3,7 @@ import numpy as np
 
 # Same stuff as image_reader.py, but with just one image
 
-img = cv2.imread('62_29.jpg')
+img = cv2.imread('62_2.jpg')
 
 img_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 cv2.imwrite('img_grey.jpg', img_grey)
@@ -89,7 +89,7 @@ img_contours = np.zeros(img.shape)
 #cv2.imwrite('approx_contours.jpg', img_contours)
 
 #Try instead drawing contours on top of BW pic
-
+print(img_contours.shape)
 cv2.drawContours(img_contours, [cnt0, cnt1], -1,(0,255,0),2)
 cv2.imwrite('contours.jpg', img_contours)
 #Find area within contour, compute growthIndex

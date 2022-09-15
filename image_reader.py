@@ -7,10 +7,10 @@ from matplotlib import pyplot as plt
 from hyphaeDetectionFunctions import load_images_from_folder
 
 #Designate folder to open
-folder_to_open = '/Users/lisarogers/Dropbox/Pictures for Lisa/20032021/0 uM/WLP028/'
+folder_to_open = '/Users/lisarogers/Dropbox/Pictures for Lisa/02152021/0 uM/62/'
 
 #Designate path to write files to 
-path = '/Users/lisarogers/PythonStuff/writtenImagesNew/'
+path = '/Users/lisarogers/Dropbox/Pictures for Lisa/Binary Pictures for Pixel Counting/test images/'
 
 #Get file name to use as string in CSV columns
 filenames = listdir(folder_to_open)
@@ -25,6 +25,7 @@ area2 = np.empty(len(Images), dtype=object)
 hyphae = np.empty(len(Images), dtype=object)
 growthIndex = np.empty(len(Images), dtype=object)
 
+
 #Need to now store the image data for ML purposes
 for n in range(0, len(Images)):
    
@@ -36,15 +37,15 @@ for n in range(0, len(Images)):
 
     # Threshhold images and save images
     _, thresh_images = cv2.threshold(blur_images,125,255,cv2.THRESH_BINARY)
-    # thresh_image = f'threshholdcolony{n}.jpg'
-    # cv2.imwrite(join(path, thresh_image), thresh_images)
+    thresh_image = f'binarycolony{n}.jpg'
+    cv2.imwrite(join(path, thresh_image), thresh_images)
   
     #Close holes with Rectangular 5x5 Kernel 
     kernal = np.ones((5, 5), np.uint8)
     #kernal = kernal/sum(kernal)
     closed_images = cv2.morphologyEx(thresh_images, cv2.MORPH_CLOSE, kernal)
-    closed_image = f'closedcolony{n}.jpg'
-    cv2.imwrite(join(path, closed_image), closed_images)
+    # closed_image = f'closedcolony{n}.jpg'
+    # cv2.imwrite(join(path, closed_image), closed_images)
 
     # Find contours
     contours, hierarchy = cv2.findContours(closed_images, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -74,43 +75,48 @@ for n in range(0, len(Images)):
     cnt2 = contours[posMax2Contour]  
 
     # # Approximate shape of contour 1 to draw
-    # arc1 = cv2.arcLength(cnt1, True)
-    # epsilon1 = 0.0001*arc1
-    # approx1 = cv2.approxPolyDP(cnt1, epsilon1, True)
+    arc1 = cv2.arcLength(cnt1, True)
+    epsilon1 = 0.0001*arc1
+    approx1 = cv2.approxPolyDP(cnt1, epsilon1, True)
 
     # # Approximate shape of contour 2 to draw
-    # arc2 = cv2.arcLength(cnt2, True)
-    # epsilon2 = 0.001*arc2
-    # approx2 = cv2.approxPolyDP(cnt2, epsilon2, True)
+    arc2 = cv2.arcLength(cnt2, True)
+    epsilon2 = 0.001*arc2
+    approx2 = cv2.approxPolyDP(cnt2, epsilon2, True)
+
+   
 
     # Draw and Store Contours
-    img_contours = np.zeros(images.shape)
-    cv2.drawContours(img_contours, [cnt1, cnt2], -1, (0,255,0), 2)
-    #cv2.drawContours(images, contours, -1, (0,255,0), 2)
-    #image_contours = f'allContours{n}.jpg'
-    #cv2.imwrite(join(path, image_contours), img_contours)
+    drawncontours = np.zeros(images.shape)
+    cv2.drawContours(drawncontours, [cnt1, cnt2], -1, (255,255,255), 2)
+    #print(drawncontours.shape)
+    #cv2.imshow("Contours", img_contours)
+    image_contours = f'allContours{n}.jpg'
+    cv2.imwrite(join(path, image_contours), drawncontours)
     
 
+    # if cv2.waitKey(0):
+    #     cv2.destroyAllWindows()
     #Compute and store Growth Index
     area1[n] = cv2.contourArea(cnt1)
     area2[n] = cv2.contourArea(cnt2)
     hyphae[n] = np.abs(area1[n] - area2[n])
     growthIndex[n] = hyphae[n]/np.minimum(area1[n],area2[n])
     
-#Statistics for each colony
-meanIndex = np.mean(growthIndex)
-medianIndex =  np.median(growthIndex)
-stdIndex = np.std(growthIndex)
-medianArea  = np.median(area2)
-varIndex = np.var(growthIndex)
+# #Statistics for each colony
+# meanIndex = np.mean(growthIndex)
+# medianIndex =  np.median(growthIndex)
+# stdIndex = np.std(growthIndex)
+# medianArea  = np.median(area2)
+# varIndex = np.var(growthIndex)
 
-#Create DataFrame for csv files
-data = {'Image Name': stringsforCSV,'Area 1': area1, 'Area 2': area2,'Growth Index': growthIndex}
-data2 = {'Mean Index': [meanIndex], 'Median Index': [medianIndex], 'Std Dev Index': [stdIndex], 'Variance Index': [varIndex]}
+# #Create DataFrame for csv files
+# data = {'Image Name': stringsforCSV,'Area 1': area1, 'Area 2': area2,'Growth Index': growthIndex}
+# data2 = {'Mean Index': [meanIndex], 'Median Index': [medianIndex], 'Std Dev Index': [stdIndex], 'Variance Index': [varIndex]}
 
-#Read data into a CSV 
-df = pd.DataFrame(data, columns = ['Image Name', 'Area 1', 'Area 2', 'Growth Index'])
-df2  = pd.DataFrame(data2, columns = ['Mean Index', 'Median Index', 'Std Dev Index', 'Variance Index'])
-newdf = df.append(df2)
-newdf.to_csv('Data 20032021 WLP028 0uM.csv')
-#df.to_csv('Analyzed Image Data')
+# #Read data into a CSV 
+# df = pd.DataFrame(data, columns = ['Image Name', 'Area 1', 'Area 2', 'Growth Index'])
+# df2  = pd.DataFrame(data2, columns = ['Mean Index', 'Median Index', 'Std Dev Index', 'Variance Index'])
+# newdf = df.append(df2)
+# newdf.to_csv('Data 20032021 F2 100uM.csv')
+# #df.to_csv('Analyzed Image Data')
