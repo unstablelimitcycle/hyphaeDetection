@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from hyphaeDetectionFunctions import load_images_from_folder
 
 #Designate folder to open
-folder_to_open = '/Users/lisarogers/Dropbox/Pictures for Lisa/02152021/0 uM/62/'
+folder_to_open = '/Users/lisarogers/Dropbox/Pictures for Lisa/02152021/0 uM/LACH/'
 
 #Designate path to write files to 
 path = '/Users/lisarogers/Dropbox/Pictures for Lisa/Binary Pictures for Pixel Counting/test images/'
@@ -24,6 +24,7 @@ area1 = np.empty(len(Images), dtype=object)
 area2 = np.empty(len(Images), dtype=object)
 hyphae = np.empty(len(Images), dtype=object)
 growthIndex = np.empty(len(Images), dtype=object)
+colony = np.empty(len(Images), dtype=object)
 
 
 #Need to now store the image data for ML purposes
@@ -84,8 +85,6 @@ for n in range(0, len(Images)):
     epsilon2 = 0.001*arc2
     approx2 = cv2.approxPolyDP(cnt2, epsilon2, True)
 
-   
-
     # Draw and Store Contours
     drawncontours = np.zeros(images.shape)
     cv2.drawContours(drawncontours, [cnt1, cnt2], -1, (255,255,255), 2)
@@ -94,14 +93,12 @@ for n in range(0, len(Images)):
     image_contours = f'allContours{n}.jpg'
     cv2.imwrite(join(path, image_contours), drawncontours)
     
-
-    # if cv2.waitKey(0):
-    #     cv2.destroyAllWindows()
     #Compute and store Growth Index
     area1[n] = cv2.contourArea(cnt1)
     area2[n] = cv2.contourArea(cnt2)
     hyphae[n] = np.abs(area1[n] - area2[n])
     growthIndex[n] = hyphae[n]/np.minimum(area1[n],area2[n])
+    colony[n] = np.minimum(area1[n],area2[n])
     
 # #Statistics for each colony
 # meanIndex = np.mean(growthIndex)
@@ -111,12 +108,12 @@ for n in range(0, len(Images)):
 # varIndex = np.var(growthIndex)
 
 # #Create DataFrame for csv files
-# data = {'Image Name': stringsforCSV,'Area 1': area1, 'Area 2': area2,'Growth Index': growthIndex}
+data = {'Image Name': stringsforCSV,'Area 1': area1, 'Area 2': area2,'Growth Index': growthIndex, 'Colony Area': colony}
 # data2 = {'Mean Index': [meanIndex], 'Median Index': [medianIndex], 'Std Dev Index': [stdIndex], 'Variance Index': [varIndex]}
 
 # #Read data into a CSV 
-# df = pd.DataFrame(data, columns = ['Image Name', 'Area 1', 'Area 2', 'Growth Index'])
+df = pd.DataFrame(data, columns = ['Image Name', 'Area 1', 'Area 2', 'Growth Index', 'Colony Area'])
 # df2  = pd.DataFrame(data2, columns = ['Mean Index', 'Median Index', 'Std Dev Index', 'Variance Index'])
 # newdf = df.append(df2)
 # newdf.to_csv('Data 20032021 F2 100uM.csv')
-# #df.to_csv('Analyzed Image Data')
+df.to_csv(path+'/Colony areas for pixel counting, LACH 0uM.csv')
