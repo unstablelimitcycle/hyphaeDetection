@@ -1,0 +1,18 @@
+#Kruskal Wallis H Test for Yeast
+from scipy import stats
+import pandas
+
+#Within Strains across concentrations
+#Read and store data from CSV
+df = pandas.read_csv('62 Data.csv', index_col = 'Image #') 
+
+#Convert Data Frame to Array
+DataGroup = df.to_numpy()
+
+group1 = DataGroup[:,0]
+group2 = DataGroup[:,1]
+group3 = DataGroup[:,2]
+print(group1)
+
+#result = stats.kruskal(group1, group2, group3)
+#print(result)
